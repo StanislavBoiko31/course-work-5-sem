@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/static/css/main.467c3bba.css",
+    "main.js": "/static/js/main.396d0e84.js",
+    "static/js/488.5b679acc.chunk.js": "/static/js/488.5b679acc.chunk.js",
+    "static/media/Flux_Dev_A_simplified_highcontrast_black_and_white_icon_of_a_c_3.jpg": "/static/media/Flux_Dev_A_simplified_highcontrast_black_and_white_icon_of_a_c_3.893cf02fa46cd854fcf0.jpg",
+    "service-worker.js": "/service-worker.js",
+    "index.html": "/index.html",
+    "main.467c3bba.css.map": "/static/css/main.467c3bba.css.map",
+    "main.396d0e84.js.map": "/static/js/main.396d0e84.js.map",
+    "488.5b679acc.chunk.js.map": "/static/js/488.5b679acc.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.467c3bba.css",
+    "static/js/main.396d0e84.js"
+  ]
+}
