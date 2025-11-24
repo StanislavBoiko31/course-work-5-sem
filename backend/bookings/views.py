@@ -580,6 +580,7 @@ class UploadBookingResultsView(APIView):
 def send_results_email(booking, recipient_email=None):
     """
     Відправляє email з результатами фотосесії незареєстрованому користувачу.
+    Файли (фото та відео) додаються як вкладення до email.
     """
     if not booking.guest_email and not recipient_email:
         return False
@@ -594,39 +595,22 @@ def send_results_email(booking, recipient_email=None):
     subject = f"Результати фотосесії від {booking.photographer.user.first_name or booking.photographer.user.email}"
     
     # Формуємо текст повідомлення
+    from django.conf import settings
+    import os
+    
     message_parts = [
         f"Вітаємо, {booking.guest_first_name or 'Шановний клієнте'}!",
         "",
         f"Ваша фотосесія від {booking.date} завершена.",
         "",
-        "Результати роботи:",
+        "Результати роботи вкладені в цей email:",
     ]
     
-    # Отримуємо базовий URL з налаштувань або використовуємо localhost для розробки
-    from django.conf import settings
-    base_url = getattr(settings, 'BASE_URL', 'http://localhost:8000')
-    
     if booking.result_photos:
-        message_parts.append(f"\nФото ({len(booking.result_photos)} файлів):")
-        for i, photo_url in enumerate(booking.result_photos, 1):
-            if photo_url.startswith('/media/'):
-                full_url = f"{base_url}{photo_url}"
-            elif photo_url.startswith('http'):
-                full_url = photo_url
-            else:
-                full_url = f"{base_url}/media/{photo_url}"
-            message_parts.append(f"{i}. {full_url}")
+        message_parts.append(f"\nФото: {len(booking.result_photos)} файлів")
     
     if booking.result_videos:
-        message_parts.append(f"\nВідео ({len(booking.result_videos)} файлів):")
-        for i, video_url in enumerate(booking.result_videos, 1):
-            if video_url.startswith('/media/'):
-                full_url = f"{base_url}{video_url}"
-            elif video_url.startswith('http'):
-                full_url = video_url
-            else:
-                full_url = f"{base_url}/media/{video_url}"
-            message_parts.append(f"{i}. {full_url}")
+        message_parts.append(f"Відео: {len(booking.result_videos)} файлів")
     
     message_parts.extend([
         "",
@@ -639,16 +623,125 @@ def send_results_email(booking, recipient_email=None):
     message = "\n".join(message_parts)
     
     try:
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        # Логуємо налаштування (без пароля)
+        logger.info(f"Відправка email на {email_to}")
+        logger.info(f"EMAIL_HOST: {settings.EMAIL_HOST}")
+        logger.info(f"EMAIL_PORT: {settings.EMAIL_PORT}")
+        logger.info(f"EMAIL_HOST_USER: {settings.EMAIL_HOST_USER}")
+        logger.info(f"EMAIL_USE_TLS: {settings.EMAIL_USE_TLS}")
+        logger.info(f"EMAIL_USE_SSL: {getattr(settings, 'EMAIL_USE_SSL', False)}")
+        
         email = EmailMessage(
             subject=subject,
             body=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             to=[email_to],
         )
+        
+        # Додаємо фото як вкладення
+        if booking.result_photos:
+            for photo_url in booking.result_photos:
+                try:
+                    # Отримуємо шлях до файлу (прибираємо /media/ з початку)
+                    if photo_url.startswith('/media/'):
+                        file_path = photo_url[7:]  # Прибираємо '/media/'
+                    elif photo_url.startswith('media/'):
+                        file_path = photo_url[6:]  # Прибираємо 'media/'
+                    else:
+                        file_path = photo_url
+                    
+                    # Використовуємо Path для правильного формування шляху
+                    from pathlib import Path
+                    full_path = Path(settings.MEDIA_ROOT) / file_path
+                    full_path = str(full_path)
+                    
+                    logger.info(f"Шукаємо файл: {full_path}")
+                    
+                    # Перевіряємо, чи файл існує
+                    if os.path.exists(full_path) and os.path.isfile(full_path):
+                        # Отримуємо ім'я файлу для вкладення
+                        filename = os.path.basename(file_path)
+                        # Визначаємо тип контенту за розширенням
+                        ext = os.path.splitext(filename)[1].lower()
+                        if ext in ['.jpg', '.jpeg']:
+                            content_type = 'image/jpeg'
+                        elif ext == '.png':
+                            content_type = 'image/png'
+                        elif ext == '.gif':
+                            content_type = 'image/gif'
+                        elif ext == '.webp':
+                            content_type = 'image/webp'
+                        else:
+                            content_type = 'image/jpeg'  # За замовчуванням
+                        
+                        with open(full_path, 'rb') as f:
+                            file_content = f.read()
+                            email.attach(filename, file_content, content_type)
+                        logger.info(f"Додано фото як вкладення: {filename} ({len(file_content)} байт)")
+                    else:
+                        logger.warning(f"Файл не знайдено або не є файлом: {full_path}")
+                except Exception as e:
+                    logger.error(f"Помилка додавання фото {photo_url}: {e}", exc_info=True)
+        
+        # Додаємо відео як вкладення
+        if booking.result_videos:
+            for video_url in booking.result_videos:
+                try:
+                    # Отримуємо шлях до файлу (прибираємо /media/ з початку)
+                    if video_url.startswith('/media/'):
+                        file_path = video_url[7:]  # Прибираємо '/media/'
+                    elif video_url.startswith('media/'):
+                        file_path = video_url[6:]  # Прибираємо 'media/'
+                    else:
+                        file_path = video_url
+                    
+                    # Використовуємо Path для правильного формування шляху
+                    from pathlib import Path
+                    full_path = Path(settings.MEDIA_ROOT) / file_path
+                    full_path = str(full_path)
+                    
+                    logger.info(f"Шукаємо відео файл: {full_path}")
+                    
+                    # Перевіряємо, чи файл існує
+                    if os.path.exists(full_path) and os.path.isfile(full_path):
+                        # Отримуємо ім'я файлу та тип контенту
+                        filename = os.path.basename(file_path)
+                        # Визначаємо тип контенту за розширенням
+                        ext = os.path.splitext(filename)[1].lower()
+                        if ext == '.mp4':
+                            content_type = 'video/mp4'
+                        elif ext == '.mov':
+                            content_type = 'video/quicktime'
+                        elif ext == '.avi':
+                            content_type = 'video/x-msvideo'
+                        elif ext == '.webm':
+                            content_type = 'video/webm'
+                        else:
+                            content_type = 'video/mp4'  # За замовчуванням
+                        
+                        with open(full_path, 'rb') as f:
+                            file_content = f.read()
+                            email.attach(filename, file_content, content_type)
+                        logger.info(f"Додано відео як вкладення: {filename} ({len(file_content)} байт)")
+                    else:
+                        logger.warning(f"Відео файл не знайдено або не є файлом: {full_path}")
+                except Exception as e:
+                    logger.error(f"Помилка додавання відео {video_url}: {e}", exc_info=True)
+        
         email.send()
+        logger.info(f"Email успішно відправлено на {email_to}")
         return True
     except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Помилка відправки email: {e}", exc_info=True)
         print(f"Помилка відправки email: {e}")
+        print(f"Тип помилки: {type(e).__name__}")
+        import traceback
+        traceback.print_exc()
         return False
 
 
