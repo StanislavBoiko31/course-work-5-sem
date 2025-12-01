@@ -10,7 +10,6 @@ const BookingPage = () => {
   const [user, setUser] = useState(null);
   const [discount, setDiscount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
 
   const isAuthenticated = Boolean(localStorage.getItem("access"));
 
@@ -37,7 +36,7 @@ const BookingPage = () => {
           setDiscount(0);
         }
       } catch (error) {
-        setMessage("Помилка завантаження даних: " + (error.response?.data?.detail || error.message));
+        console.error("Помилка завантаження даних:", error.response?.data?.detail || error.message);
       } finally {
         setLoading(false);
       }

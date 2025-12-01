@@ -8,6 +8,9 @@ class Portfolio(models.Model):
     description = models.TextField()
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ['-id']  # Сортування для пагінації (нові спочатку)
+
     def __str__(self):
         return f"{self.photographer} - {self.description[:20]}"
 
@@ -26,6 +29,12 @@ class HomePageContent(models.Model):
     contact_emails = models.JSONField(default=list, blank=True, verbose_name="Email для контактів (список)")
     contact_phones = models.JSONField(default=list, blank=True, verbose_name="Телефони (список)")
     contact_addresses = models.JSONField(default=list, blank=True, verbose_name="Адреси (список)")
+    guest_promo_text = models.CharField(
+        max_length=255,
+        blank=True,
+        default="Зареєструйтесь, щоб отримати персональну знижку на фотосесію.",
+        verbose_name="Текст для гостей (незареєстрованих користувачів)",
+    )
     is_active = models.BooleanField(default=True, verbose_name="Активний")
     
     # Залишаємо старі поля для зворотної сумісності (deprecated)

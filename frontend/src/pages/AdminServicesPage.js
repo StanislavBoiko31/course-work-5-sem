@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../axiosInstance";
 
-const initialForm = { name: "", description: "", price: "", duration: "", image: null };
+const initialForm = { name: "", description: "", price: "", duration: "", image: null, location_address: "" };
 
 const AdminServicesPage = () => {
   const [services, setServices] = useState([]);
@@ -35,7 +35,14 @@ const AdminServicesPage = () => {
   };
 
   const openEditForm = (item) => {
-    setForm({ name: item.name || "", description: item.description || "", price: item.price || "", duration: item.duration || "", image: null });
+    setForm({ 
+      name: item.name || "", 
+      description: item.description || "", 
+      price: item.price || "", 
+      duration: item.duration || "", 
+      image: null,
+      location_address: item.location_address || ""
+    });
     setEditId(item.id);
     setShowForm(true);
     setError("");
@@ -71,6 +78,7 @@ const AdminServicesPage = () => {
     formData.append("description", form.description);
     formData.append("price", form.price);
     formData.append("duration", form.duration);
+    if (form.location_address) formData.append("location_address", form.location_address);
     if (form.image) formData.append("image", form.image);
     try {
       let res;
@@ -118,6 +126,17 @@ const AdminServicesPage = () => {
             <textarea name="description" className="form-control" value={form.description} onChange={handleChange} />
           </div>
           <div className="mb-2">
+            <label className="form-label">Адреса локації</label>
+            <textarea 
+              name="location_address" 
+              className="form-control" 
+              value={form.location_address} 
+              onChange={handleChange}
+              placeholder="Адреса студії або локація клієнта (наприклад, для фотосесії весілля). Залиште порожнім, якщо локація вибирається окремо."
+              rows="2"
+            />
+          </div>
+          <div className="mb-2">
             <label className="form-label">Ціна (грн) *</label>
             <input type="number" name="price" className="form-control" value={form.price} onChange={handleChange} required />
           </div>
@@ -143,6 +162,7 @@ const AdminServicesPage = () => {
             <th style={{ width: 120 }}>Фото</th>
             <th style={{ width: 180 }}>Назва</th>
             <th>Опис</th>
+            <th style={{ width: 150 }}>Адреса локації</th>
             <th style={{ width: 100 }}>Ціна</th>
             <th style={{ width: 120 }}>Тривалість</th>
             <th style={{ width: 220 }}>Майстри</th>
@@ -156,6 +176,7 @@ const AdminServicesPage = () => {
               <td>{item.image && <img src={item.image} alt="service" style={{ maxWidth: 110, maxHeight: 80, objectFit: 'cover', borderRadius: 8 }} />}</td>
               <td style={{ fontWeight: 500 }}>{item.name}</td>
               <td>{item.description}</td>
+              <td>{item.location_address || <span style={{ color: '#888' }}>не вказано</span>}</td>
               <td>{item.price}</td>
               <td>{item.duration}</td>
               <td>

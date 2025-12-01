@@ -7,7 +7,6 @@ const PhotographerPortfolioPage = () => {
   const { id } = useParams();
   const [photographer, setPhotographer] = useState(null);
   const [portfolio, setPortfolio] = useState([]);
-  const [services, setServices] = useState([]);
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
@@ -19,11 +18,6 @@ const PhotographerPortfolioPage = () => {
     // Завантажуємо портфоліо
     axiosInstance.get(`/api/portfolio/?photographer=${id}`)
       .then(res => setPortfolio(res.data.results || res.data))
-      .catch(err => console.error(err));
-    
-    // Завантажуємо всі послуги
-    axiosInstance.get('/api/services/')
-      .then(res => setServices(res.data.results || res.data))
       .catch(err => console.error(err));
   }, [id]);
 

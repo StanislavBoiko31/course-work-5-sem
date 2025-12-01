@@ -3,8 +3,6 @@ import { useParams, Link } from "react-router-dom";
 import axiosInstance from "../axiosInstance";
 import ZoomableImage from "../components/ZoomableImage";
 
-const getImageUrl = (url) => url?.startsWith('/media/') ? `http://localhost:8000${url}` : url;
-
 const ServiceDetailPage = () => {
   const { id } = useParams();
   const [service, setService] = useState(null);
@@ -49,6 +47,9 @@ const ServiceDetailPage = () => {
           <p>{service.description}</p>
           <p><b>Ціна:</b> {service.price} грн</p>
           <p><b>Тривалість:</b> {service.duration} хв</p>
+          {service.location_address && (
+            <p><b>Адреса локації:</b> {service.location_address}</p>
+          )}
           <Link to="/booking" className="btn btn-primary mb-3">Замовити фотосесію</Link>
         </div>
       </div>

@@ -4,7 +4,7 @@ import { getPortfolio } from "../api/studioApi";
 import axiosInstance from "../axiosInstance";
 import ZoomableImage from "../components/ZoomableImage";
 
-const PortfolioPage = () => {
+const PortfolioPage = ({ isAuth }) => {
   const [portfolio, setPortfolio] = useState([]);
   const [filter, setFilter] = useState("all");
   const [homePageContent, setHomePageContent] = useState(null);
@@ -61,6 +61,12 @@ const PortfolioPage = () => {
             <p style={{ fontSize: "1.25rem", lineHeight: "1.8", maxWidth: "800px", margin: "0 auto 30px" }}>
               {homePageContent.description}
             </p>
+            {/* Текст тільки для гостей (незареєстрованих користувачів) */}
+            {!isAuth && homePageContent.guest_promo_text && (
+              <p style={{ fontSize: "1.1rem", lineHeight: "1.6", maxWidth: "800px", margin: "0 auto", fontWeight: "500" }}>
+                {homePageContent.guest_promo_text}
+              </p>
+            )}
           </div>
         </div>
       )}

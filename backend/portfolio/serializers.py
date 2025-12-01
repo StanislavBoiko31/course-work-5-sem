@@ -10,10 +10,14 @@ class PortfolioSerializer(serializers.ModelSerializer):
     photographer_obj = PhotographerSerializer(source='photographer', read_only=True)
     service = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), required=True)
     photographer = serializers.PrimaryKeyRelatedField(queryset=Photographer.objects.all(), required=False)
+    image = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Portfolio
         fields = '__all__'
+        extra_kwargs = {
+            'image': {'required': False, 'allow_null': True}
+        }
 
 
 class HomePageContentSerializer(serializers.ModelSerializer):

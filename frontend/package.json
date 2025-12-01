@@ -20,7 +20,16 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint \"src/**/*.js\"",
+    "lint:fix": "eslint \"src/**/*.js\" --fix",
+    "lint:quiet": "eslint \"src/**/*.js\" --quiet",
+    "lint:report": "eslint \"src/**/*.js\" > eslint_report.txt",
+    "lint:json": "eslint \"src/**/*.js\" --format json > eslint_report.json",
+    "lint:html": "eslint \"src/**/*.js\" --format html > eslint_report.html",
+    "lint:compact": "eslint \"src/**/*.js\" --format compact",
+    "lint:pages": "eslint \"src/pages/**/*.js\" --format json > eslint_pages_report.json",
+    "lint:components": "eslint \"src/components/**/*.js\" --format json > eslint_components_report.json"
   },
   "eslintConfig": {
     "extends": [

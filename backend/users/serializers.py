@@ -38,3 +38,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = 'email'
+    
+    def validate(self, attrs):
+        try:
+            data = super().validate(attrs)
+            return data
+        except Exception as e:
+            # Покращена обробка помилок автентифікації
+            from rest_framework import serializers
+            raise serializers.ValidationError({
+                'detail': 'Невірний email або пароль. Перевірте правильність введених даних.'
+            })

@@ -8,7 +8,7 @@ class HomePageContentAdmin(admin.ModelAdmin):
     list_display = ('title', 'is_active')
     fieldsets = (
         ('Основний контент', {
-            'fields': ('title', 'description', 'is_active')
+            'fields': ('title', 'description', 'guest_promo_text', 'is_active')
         }),
         ('Контактна інформація', {
             'fields': ('contact_emails', 'contact_phones', 'contact_addresses'),

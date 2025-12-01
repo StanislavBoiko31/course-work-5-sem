@@ -94,7 +94,7 @@ const ProfilePage = ({ onLogout }) => {
         setPhotographers(allPhotographers);
       }
     }
-  }, [editOrderForm.service_id, allPhotographers, editOrderId]);
+  }, [editOrderForm.service_id, editOrderForm.photographer_id, allPhotographers, editOrderId]);
 
   // Підвантаження слотів при зміні service/photographer/date у формі редагування
   useEffect(() => {

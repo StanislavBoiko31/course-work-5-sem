@@ -1,0 +1,64 @@
+[run]
+source = .
+omit = 
+    */migrations/*
+    */venv/*
+    */tests/*
+    */test_*.py
+    */__pycache__/*
+    */manage.py
+    */conftest.py
+    */settings.py
+    */wsgi.py
+    */asgi.py
+    */admin.py
+    */apps.py
+    */urls.py
+    */pytest.ini
+    */requirements.txt
+    */env.example
+    */README.md
+    */DJANGO_DEBUG_TOOLBAR_GUIDE.md
+    */EMAIL_SETUP_GUIDE.md
+    */PERFORMANCE_METRICS_REPORT.md
+    */DEBUG_TOOLBAR_ANALYSIS_REPORT.md
+    */PYLINT_*.md
+    */ESLINT_REPORTS.md
+    */ARCHITECTURE*.md
+    */DATABASE*.md
+    */PROJECT_DIAGRAM*.md
+    */BACKEND_*.md
+    */COMPONENTS*.md
+    */STORAGE*.md
+    */DISCOUNT*.md
+    */USERS_GUIDE.md
+    */README*.md
+    */test_*.py
+    */tests.py
+    */e2e_tests/*
+    */management/commands/*
+    */test_*.py
+    */test_email.py
+    */test_smtp*.py
+    */test_django_email.py
+    */create_users.py
+    */list_users.py
+    */show_users.py
+    */reset_password.py
+    */reset_all_passwords.py
+
+[report]
+precision = 2
+show_missing = True
+skip_covered = False
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    @abstractmethod
+    class .*\bProtocol\):
+    @(abc\.)?abstractmethod
+

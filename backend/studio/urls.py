@@ -62,3 +62,10 @@ urlpatterns += [
 urlpatterns += [
     path('api/portfolio/', include('portfolio.urls')),
 ]
+
+# Django Debug Toolbar URLs (тільки для розробки)
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns

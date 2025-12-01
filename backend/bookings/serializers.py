@@ -33,7 +33,18 @@ class BookingSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context.get('request')
-        user = request.user if request and request.user.is_authenticated else None
+        # Check if user is authenticated, handling both real requests and mocks
+        if request and hasattr(request, 'user'):
+            try:
+                is_authenticated = getattr(request.user, 'is_authenticated', False)
+                # Handle both property and attribute
+                if callable(is_authenticated):
+                    is_authenticated = is_authenticated()
+                user = request.user if is_authenticated else None
+            except (AttributeError, TypeError):
+                user = None
+        else:
+            user = None
 
         # Дістаємо service і photographer з validated_data або з service_id/photographer_id
         service = validated_data.pop('service', None)

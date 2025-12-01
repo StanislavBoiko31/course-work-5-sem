@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../axiosInstance";
-import { useNavigate } from "react-router-dom";
 
 const PhotographerProfilePage = () => {
   const [photographer, setPhotographer] = useState(null);
@@ -25,7 +24,6 @@ const PhotographerProfilePage = () => {
   const [uploadingResults, setUploadingResults] = useState(false);
   const [uploadPhotos, setUploadPhotos] = useState([]);
   const [uploadVideos, setUploadVideos] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     axiosInstance.get("/api/photographers/me/")

@@ -5,6 +5,7 @@ const AdminHomePageContentPage = () => {
   const [content, setContent] = useState({
     title: "",
     description: "",
+    guest_promo_text: "",
     contact_emails: [],
     contact_phones: [],
     contact_addresses: [],
@@ -25,6 +26,7 @@ const AdminHomePageContentPage = () => {
         setContent({
           title: data.title || "",
           description: data.description || "",
+          guest_promo_text: data.guest_promo_text || "",
           contact_emails: data.contact_emails && data.contact_emails.length > 0 
             ? data.contact_emails 
             : (data.contact_email ? [data.contact_email] : []),
@@ -93,6 +95,7 @@ const AdminHomePageContentPage = () => {
     const dataToSend = {
       title: content.title,
       description: content.description,
+      guest_promo_text: content.guest_promo_text,
       is_active: content.is_active,
       contact_emails: Array.isArray(content.contact_emails) 
         ? content.contact_emails.filter(email => email && email.trim() !== "") 
@@ -161,6 +164,21 @@ const AdminHomePageContentPage = () => {
             required
             placeholder="Опис студії (2-3 речення)"
           />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Текст для гостей (незареєстрованих користувачів)</label>
+          <textarea
+            name="guest_promo_text"
+            className="form-control"
+            rows="3"
+            value={content.guest_promo_text}
+            onChange={handleChange}
+            placeholder="Наприклад: Зареєструйтесь, щоб отримати персональну знижку на фотосесію."
+          />
+          <div className="form-text">
+            Цей текст відображається на головній сторінці тільки для гостей (користувачів без акаунта).
+          </div>
         </div>
 
         <div className="mb-3">

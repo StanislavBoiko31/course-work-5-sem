@@ -8,7 +8,7 @@ from .models import Booking
 from .serializers import BookingSerializer
 from services.models import Service
 from photographers.models import Photographer
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta, time, date as date_type
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from users.models import User
@@ -195,7 +195,25 @@ def is_slot_available(photographer, date, start_time, duration):
     if end_time > photographer.work_end:
         return False, "Час закінчення виходить за межі робочого дня"
 
-    # 3. Перевірка перетину з іншими бронюваннями
+    # 3. Перевірка, чи не минув час для сьогоднішніх бронювань
+    today = date_type.today()
+    if date == today:
+        now = datetime.now()
+        # Округлюємо поточний час до наступного 15-хвилинного інтервалу
+        # Наприклад: 16:17 -> 16:30, 16:30 -> 16:45, 16:45 -> 17:00
+        current_minute = now.minute
+        rounded_minute = ((current_minute // 15) + 1) * 15
+        if rounded_minute >= 60:
+            rounded_hour = now.hour + 1
+            rounded_minute = 0
+        else:
+            rounded_hour = now.hour
+        min_available_time = time(rounded_hour, rounded_minute)
+        
+        if start_time < min_available_time:
+            return False, "Неможливо забронювати час, який вже минув"
+
+    # 4. Перевірка перетину з іншими бронюваннями
     bookings = Booking.objects.filter(
         photographer=photographer,
         date=date,
@@ -237,9 +255,31 @@ class AvailableSlotsView(APIView):
         slots = []
         start = datetime.combine(date, photographer.work_start)
         end = datetime.combine(date, photographer.work_end)
+        
+        # Якщо дата - сьогодні, обчислюємо мінімальний доступний час
+        today = date_type.today()
+        min_available_time = None
+        if date == today:
+            now = datetime.now()
+            # Округлюємо поточний час до наступного 15-хвилинного інтервалу
+            current_minute = now.minute
+            rounded_minute = ((current_minute // 15) + 1) * 15
+            if rounded_minute >= 60:
+                rounded_hour = now.hour + 1
+                rounded_minute = 0
+            else:
+                rounded_hour = now.hour
+            min_available_time = time(rounded_hour, rounded_minute)
+        
         while start + timedelta(minutes=duration) <= end:
             slot_start = start.time()
             slot_end = (start + timedelta(minutes=duration)).time()
+            
+            # Пропускаємо слоти, які вже минули (для сьогодні)
+            if min_available_time and slot_start < min_available_time:
+                start += timedelta(minutes=15)
+                continue
+            
             # Перевірка перетину з бронюваннями
             overlap = Booking.objects.filter(
                 photographer=photographer,
@@ -293,9 +333,28 @@ class AvailableDatesView(APIView):
                 start = datetime.combine(current_date, photographer.work_start)
                 end = datetime.combine(current_date, photographer.work_end)
                 
+                # Якщо дата - сьогодні, обчислюємо мінімальний доступний час
+                min_available_time = None
+                if current_date == today:
+                    now = datetime.now()
+                    # Округлюємо поточний час до наступного 15-хвилинного інтервалу
+                    current_minute = now.minute
+                    rounded_minute = ((current_minute // 15) + 1) * 15
+                    if rounded_minute >= 60:
+                        rounded_hour = now.hour + 1
+                        rounded_minute = 0
+                    else:
+                        rounded_hour = now.hour
+                    min_available_time = time(rounded_hour, rounded_minute)
+                
                 while start + timedelta(minutes=duration) <= end:
                     slot_start = start.time()
                     slot_end = (start + timedelta(minutes=duration)).time()
+                    
+                    # Пропускаємо слоти, які вже минули (для сьогодні)
+                    if min_available_time and slot_start < min_available_time:
+                        start += timedelta(minutes=15)
+                        continue
                     
                     # Перевірка перетину з бронюваннями
                     overlap = Booking.objects.filter(
@@ -417,9 +476,13 @@ class BookingUpdateView(generics.RetrieveUpdateAPIView):
                 except:
                     additional_service_ids = [additional_service_ids] if additional_service_ids else []
             elif not isinstance(additional_service_ids, list):
+                # Якщо це не список, перетворюємо в список
                 additional_service_ids = [additional_service_ids] if additional_service_ids else []
             
             # Фільтруємо порожні значення з масиву
+            # Переконуємося, що additional_service_ids - це список перед ітерацією
+            if not isinstance(additional_service_ids, list):
+                additional_service_ids = [additional_service_ids] if additional_service_ids else []
             additional_service_ids = [id for id in additional_service_ids if id and str(id).strip()]
             
             from services.models import AdditionalService

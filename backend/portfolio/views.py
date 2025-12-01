@@ -11,7 +11,7 @@ from users.views import IsAdminPermission
 # Create your views here.
 
 class PortfolioViewSet(viewsets.ModelViewSet):
-    queryset = Portfolio.objects.all()
+    queryset = Portfolio.objects.all().order_by('-id')
     serializer_class = PortfolioSerializer
 
     def get_permissions(self):
@@ -35,7 +35,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(service_id=service_id)
         if photographer_id:
             queryset = queryset.filter(photographer_id=photographer_id)
-        return queryset
+        return queryset.order_by('-id')
 
     def perform_create(self, serializer):
         user = self.request.user
@@ -69,7 +69,7 @@ class PortfolioMyViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if hasattr(user, "role") and user.role == "photographer":
             photographer = getattr(user, "photographer", None)
-            return Portfolio.objects.filter(photographer=photographer)
+            return Portfolio.objects.filter(photographer=photographer).order_by('-id')
         return Portfolio.objects.none()
     def perform_create(self, serializer):
         user = self.request.user

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../axiosInstance";
-import { getPhotographers, getServices } from "../api/studioApi";
+import { getPhotographers } from "../api/studioApi";
 
 // Додаємо простий модальний компонент
 const Modal = ({ open, onClose, children }) => {
@@ -25,7 +25,6 @@ const statusLabels = {
 const AdminBookingsPage = () => {
   const [bookings, setBookings] = useState([]);
   const [photographers, setPhotographers] = useState([]);
-  const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [statusFilter, setStatusFilter] = useState("");

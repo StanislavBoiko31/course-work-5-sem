@@ -32,7 +32,25 @@ const LoginPage = ({ onLogin }) => {
         setError("Не вдалося отримати профіль користувача");
       }
     } catch (err) {
-      setError("Помилка входу: " + (err.response?.data?.detail || err.message));
+      // Обробка різних форматів помилок від сервера
+      let errorMessage = "Помилка входу";
+      
+      if (err.response?.data) {
+        // JWT повертає помилки в різних форматах
+        if (err.response.data.detail) {
+          errorMessage = err.response.data.detail;
+        } else if (err.response.data.non_field_errors) {
+          errorMessage = err.response.data.non_field_errors[0] || err.response.data.non_field_errors;
+        } else if (typeof err.response.data === 'string') {
+          errorMessage = err.response.data;
+        } else {
+          errorMessage = "Невірний email або пароль";
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
     }
   };
 

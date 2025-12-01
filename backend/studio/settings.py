@@ -31,6 +31,11 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 CORS_ALLOW_ALL_ORIGINS = True  # для розробки
+
+# Перевірка, чи запущені тести
+import sys
+TESTING = 'test' in sys.argv or 'pytest' in sys.modules or os.environ.get('PYTEST_CURRENT_TEST')
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -51,6 +56,10 @@ INSTALLED_APPS = [
     'corsheaders',
 ]
 
+# Django Debug Toolbar (додаємо тільки в режимі розробки, не під час тестів)
+if DEBUG and not TESTING:
+    INSTALLED_APPS += ['debug_toolbar']
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -61,6 +70,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Django Debug Toolbar middleware (додаємо тільки в режимі розробки, не під час тестів)
+if DEBUG and not TESTING:
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
 ROOT_URLCONF = 'studio.urls'
 
@@ -95,6 +108,13 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+# Test database configuration (uses SQLite for faster tests)
+if TESTING:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:'
+    }
 
 
 # Password validation
@@ -175,3 +195,17 @@ EMAIL_TIMEOUT = 30  # Таймаут підключення в секундах
 
 # Базовий URL для посилань у email (для production змініть на ваш домен)
 BASE_URL = config('BASE_URL', default='http://localhost:8000')
+
+# Django Debug Toolbar налаштування (тільки в режимі розробки, не під час тестів)
+if DEBUG and not TESTING:
+    INTERNAL_IPS = [
+        '127.0.0.1',
+        'localhost',
+    ]
+    
+    # Додаткові налаштування для Debug Toolbar
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK': lambda request: DEBUG,
+        'SHOW_COLLAPSED': True,
+        'SHOW_TEMPLATE_CONTEXT': True,
+    }

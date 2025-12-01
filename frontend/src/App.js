@@ -59,7 +59,7 @@ function App() {
     <Router>
       <Header user={user} />
       <Routes>
-        <Route path="/" element={<PortfolioPage />} />
+        <Route path="/" element={<PortfolioPage isAuth={isAuth} />} />
         <Route path="/photographers" element={<PhotographersPage />} />
         <Route path="/photographers/:id/portfolio" element={<PhotographerPortfolioPage />} />
         <Route path="/services" element={<ServicesPage />} />

@@ -3,4 +3,17 @@ djangorestframework==3.14.0
 django-cors-headers==4.3.1
 Pillow==10.1.0
 python-decouple==3.8
-django-filter==23.3 
+django-filter==23.3
+pylint==3.0.3
+pylint-django==2.5.5
+django-debug-toolbar==4.2.0
+# Testing
+pytest==7.4.3
+pytest-django==4.7.0
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+coverage==7.3.2
+factory-boy==3.3.0
+# E2E Testing
+selenium==4.15.2
+webdriver-manager==4.0.1 

@@ -19,10 +19,10 @@ class PhotographerViewSet(viewsets.ModelViewSet):
     serializer_class = PhotographerSerializer
 
     def get_queryset(self):
-        return Photographer.objects.filter(user__is_active=True)
+        return Photographer.objects.filter(user__is_active=True).order_by('user__email')
 
 class PhotographerListView(generics.ListAPIView):
-    queryset = Photographer.objects.all()
+    queryset = Photographer.objects.all().order_by('user__email')
     serializer_class = PhotographerSerializer
 
 class PhotographerDetailView(generics.RetrieveAPIView):
@@ -30,7 +30,7 @@ class PhotographerDetailView(generics.RetrieveAPIView):
     serializer_class = PhotographerSerializer
 
 class PhotographerAdminViewSet(viewsets.ModelViewSet):
-    queryset = Photographer.objects.all()
+    queryset = Photographer.objects.all().order_by('user__email')
     serializer_class = PhotographerSerializer
     permission_classes = [IsAdminPermission]
 
@@ -48,4 +48,8 @@ class PhotographerMeView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         user = self.request.user
-        return Photographer.objects.get(user=user)
+        try:
+            return Photographer.objects.get(user=user)
+        except Photographer.DoesNotExist:
+            from rest_framework.exceptions import NotFound
+            raise NotFound("Photographer profile not found for this user.")

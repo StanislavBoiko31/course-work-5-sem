@@ -1,0 +1,61 @@
+[MASTER]
+# Використовуємо Python 3
+py-version=3.12
+
+# Шляхи до модулів Django
+init-hook='import sys; import os; sys.path.append("."); os.environ.setdefault("DJANGO_SETTINGS_MODULE", "studio.settings"); import django; django.setup()'
+
+# Ігноруємо деякі папки
+ignore=migrations,venv,__pycache__,media
+
+[MESSAGES CONTROL]
+# Вимкнути деякі перевірки, які не підходять для Django
+disable=
+    missing-docstring,
+    too-few-public-methods,
+    too-many-public-methods,
+    too-many-arguments,
+    too-many-locals,
+    too-many-branches,
+    too-many-statements,
+    too-many-instance-attributes,
+    import-outside-toplevel,
+    unused-argument,
+    broad-except,
+    fixme,
+    consider-using-f-string,
+    use-dict-literal
+
+# Включити корисні перевірки
+enable=
+    unused-import,
+    unused-variable,
+    undefined-variable,
+    import-error,
+    no-name-in-module,
+    wrong-import-order,
+    wrong-import-position
+
+[FORMAT]
+# Максимальна довжина рядка
+max-line-length=120
+
+[DESIGN]
+# Максимальна кількість аргументів функції
+max-args=10
+
+# Максимальна кількість атрибутів класу
+max-attributes=15
+
+# Максимальна кількість локальних змінних
+max-locals=20
+
+# Максимальна кількість гілок
+max-branches=15
+
+# Максимальна кількість операторів
+max-statements=60
+
+[REFACTORING]
+# Максимальна кількість повернень з функції
+max-returns=10
